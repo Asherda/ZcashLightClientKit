@@ -13,6 +13,8 @@ public enum RustWeldingError: Error {
     case dataDbInitFailed(message: String)
     case dataDbNotEmpty
     case saplingSpendParametersNotFound
+    case malformedStringInput
+    case noConsensusBranchId(height: Int32)
 }
 
 public struct ZcashRustBackendWeldingConstants {
@@ -47,13 +49,22 @@ public protocol ZcashRustBackendWelding {
     static func isValidTransparentAddress(_ address: String) throws -> Bool
     
     /**
-    initialize the blocks table from a given checkpoint (birthday)
+    initialize the accounts table from a given seed and a number of accounts
      - Parameters:
        - dbData: location of the data db
        - seed: byte array of the zip32 seed
        - accounts: how many accounts you want to have
  */
     static func initAccountsTable(dbData: URL, seed: [UInt8], accounts: Int32) -> [String]?
+    
+    /**
+    initialize the accounts table from a given seed and a number of accounts
+     - Parameters:
+       - dbData: location of the data db
+       - exfvks: byte array of the zip32 seed
+     - Returns: a boolean indicating if the database was initialized or an error
+ */
+    static func initAccountsTable(dbData: URL, exfvks: [String]) throws -> Bool
     
     /**
     initialize the blocks table from a given checkpoint (birthday)
@@ -164,13 +175,14 @@ public protocol ZcashRustBackendWelding {
         - dbData: URL for the Data DB
         - account: the account index that will originate the transaction
         - extsk: extended spending key string
+        - consensusBranchId: the current consensus ID
         - to: recipient address
         - value: transaction amount in Zatoshi
         - memo: the memo string for this transaction
         - spendParamsPath: path escaped String for the filesystem locations where the spend parameters are located
         - outputParamsPath: path escaped String for the filesystem locations where the output parameters are located
      */
-    static func createToAddress(dbData: URL, account: Int32, extsk: String, to: String, value: Int64, memo: String?, spendParamsPath: String, outputParamsPath: String) -> Int64
+    static func createToAddress(dbData: URL, account: Int32, extsk: String, consensusBranchId: Int32, to: String, value: Int64, memo: String?, spendParamsPath: String, outputParamsPath: String) -> Int64
     
     /**
      Derives a full viewing key from a seed
@@ -187,7 +199,7 @@ public protocol ZcashRustBackendWelding {
     - Returns: an array containing the derived keys
     - Throws: RustBackendError if fatal error occurs
     */
-    static func deriveExtendedFullViewingKeys(seed: String, accounts: Int32) throws -> [String]?
+    static func deriveExtendedFullViewingKeys(seed: [UInt8], accounts: Int32) throws -> [String]?
     
     /**
     Derives a set of full viewing keys from a seed
@@ -196,5 +208,36 @@ public protocol ZcashRustBackendWelding {
     - Returns: an array containing the spending keys
     - Throws: RustBackendError if fatal error occurs
     */
-    static func deriveExtendedSpendingKeys(seed: String, accounts: Int32) throws -> [String]?
+    static func deriveExtendedSpendingKeys(seed: [UInt8], accounts: Int32) throws -> [String]?
+    
+    /**
+     Derives a shielded address from a seed
+     - Parameter seed: an array of bytes of the seed
+     - Parameter accountIndex: the index of the account you want the address for
+     - Returns: an optional String containing the Shielded address
+     - Throws: RustBackendError if fatal error occurs
+     */
+    static func deriveShieldedAddressFromSeed(seed: [UInt8], accountIndex: Int32) throws -> String?
+    
+    /**
+     Derives a shielded address from an Extended Full Viewing Key
+     - Parameter extfvk: a string containing the extended full viewing key
+     - Returns: an optional String containing the Shielded address
+     - Throws: RustBackendError if fatal error occurs
+     */
+    static func deriveShieldedAddressFromViewingKey(_  extfvk: String) throws -> String?
+    
+    /**
+     Derives a shielded address from an Extended Full Viewing Key
+     - Parameter seed: an array of bytes of the seed
+     - Returns: an optional String containing the transparent address
+     - Throws: RustBackendError if fatal error occurs
+     */
+    static func deriveTransparentAddressFromSeed(seed: [UInt8]) throws -> String?
+    
+    /**
+     Gets the consensus branch id for the given height
+     - Parameter height: the height you what to know the branch id for
+     */
+    static func consensusBranchIdFor(height: Int32) throws -> Int32
 }

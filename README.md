@@ -1,7 +1,9 @@
 # Zcash iOS Framework
 
-A Zcash Lightweight Client SDK for iOS
+[![Build Status](https://travis-ci.org/zcash/ZcashLightClientKit.svg?branch=master)](https://travis-ci.org/zcash/ZcashLightClientKit)
 
+
+A Zcash Lightweight Client SDK for iOS
 This is an alpha build and is currently under active development. Please be advised of the following:
 
 - This code currently is not audited by an external security auditor, use it at your own risk
@@ -12,7 +14,7 @@ This is an alpha build and is currently under active development. Please be advi
 
 - The Zcash iOS Wallet SDK is experimental and a work in progress. Use it at your own risk.
 - Developers using this SDK must familiarize themselves with the current [threat
-  model](docs/ThreatModel.md), especially the known weaknesses described there.
+  model](https://zcash.readthedocs.io/en/latest/rtd_pages/wallet_threat_model.html), especially the known weaknesses described there.
 
 # Build dependencies
 
@@ -234,6 +236,11 @@ and https://z.cash/downloads/sapling-output.params and then move them to the cor
 
 ![how to fix missing params files](docs/images/output_params_error.png)
 
+### can't find crate for ...  target may not be installed
+This error could be a side effect of having more then one rust toolchain installed. 
+If you worked with ZcashLightClientKit 0.6.6 or below you might have had to set the compiler to 1.40.0 which can cause this compilation error to happen.
+make sure that the directory that you are working on has the correct rust environment.
+You can do so by calling `rustup show` in the working directory. 
 
 ## Versioning
 
@@ -256,4 +263,4 @@ Examples can be found in the [Demo App](/Example/ZcashLightClientSample).
 
 # License
 
-Apache License Version 2.0
+MIT

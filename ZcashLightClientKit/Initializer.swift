@@ -17,6 +17,7 @@ public enum InitializerError: Error {
     case dataDbInitFailed
     case accountInitFailed
     case falseStart
+    case invalidViewingKey(key: String)
 }
 
 /**
@@ -26,7 +27,7 @@ public struct LightWalletEndpoint {
     public var host: String
     public var port: Int
     public var secure: Bool
-    
+    public var timeout: TimeInterval
     
 /**
      initializes a LightWalletEndpoint
@@ -35,10 +36,11 @@ public struct LightWalletEndpoint {
         - port: string with the port of the host address
         - secure: true if connecting through TLS. Default value is true
      */
-    public init(address: String, port: Int, secure: Bool = true) {
+    public init(address: String, port: Int, secure: Bool = true, timeout: TimeInterval = 10) {
         self.host = address
         self.port = port
         self.secure = secure
+        self.timeout = timeout
     }
 }
 
@@ -50,22 +52,21 @@ public struct LightWalletEndpoint {
  */
 public class Initializer {
     
-    private(set) var rustBackend: ZcashRustBackendWelding.Type = ZcashRustBackend.self
-    private var lowerBoundHeight: BlockHeight = ZcashSDK.SAPLING_ACTIVATION_HEIGHT
+    private(set) var rustBackend: ZcashRustBackendWelding.Type
+    private(set) var alias: String
+    private(set) var endpoint: LightWalletEndpoint
+    
+    private var lowerBoundHeight: BlockHeight
     private(set) var cacheDbURL: URL
     private(set) var dataDbURL: URL
     private(set) var pendingDbURL: URL
     private(set) var spendParamsURL: URL
     private(set) var outputParamsURL: URL
-    private var walletBirthday: WalletBirthday?
-    private(set) var lightWalletService: LightWalletGRPCService
+    private(set) var lightWalletService: LightWalletService
     private(set) var transactionRepository: TransactionRepository
     private(set) var downloader: CompactBlockDownloader
     private(set) var processor: CompactBlockProcessor?
-    /**
-     the LightWalletEndpoint that this initializer is connecting to
-     */
-    public private(set) var endpoint: LightWalletEndpoint
+
     /**
      Constructs the Initializer
      - Parameters:
@@ -76,22 +77,67 @@ public class Initializer {
         - spendParamsURL: location of the spend parameters
         - outputParamsURL: location of the output parameters
      */
-    public init (cacheDbURL: URL, dataDbURL: URL, pendingDbURL: URL, endpoint: LightWalletEndpoint, spendParamsURL: URL, outputParamsURL: URL, loggerProxy: Logger? = nil) {
-        
-        logger = loggerProxy
-        self.cacheDbURL = cacheDbURL
-        self.dataDbURL = dataDbURL
-        self.endpoint = endpoint
-        self.pendingDbURL = pendingDbURL
-        self.spendParamsURL = spendParamsURL
-        self.outputParamsURL = outputParamsURL
-        self.lightWalletService = LightWalletGRPCService(endpoint: endpoint)
-        self.transactionRepository = TransactionRepositoryBuilder.build(dataDbURL: dataDbURL)
+    convenience public init (cacheDbURL: URL,
+                 dataDbURL: URL,
+                 pendingDbURL: URL,
+                 endpoint: LightWalletEndpoint,
+                 spendParamsURL: URL,
+                 outputParamsURL: URL,
+                 alias: String = "",
+                 loggerProxy: Logger? = nil) {
         
         let storage = CompactBlockStorage(url: cacheDbURL, readonly: false)
         try? storage.createTable()
-        self.downloader = CompactBlockDownloader(service: lightWalletService, storage: storage)
         
+        let lwdService = LightWalletGRPCService(endpoint: endpoint)
+        
+        self.init(rustBackend: ZcashRustBackend.self,
+                  lowerBoundHeight: ZcashSDK.SAPLING_ACTIVATION_HEIGHT,
+                  cacheDbURL: cacheDbURL,
+                  dataDbURL: dataDbURL,
+                  pendingDbURL: pendingDbURL,
+                  endpoint: endpoint,
+                  service: lwdService,
+                  repository: TransactionRepositoryBuilder.build(dataDbURL: dataDbURL),
+                  downloader: CompactBlockDownloader(service: lwdService, storage: storage),
+                  spendParamsURL: spendParamsURL,
+                  outputParamsURL: outputParamsURL,
+                  alias: alias,
+                  loggerProxy: loggerProxy
+        )
+    }
+    
+    /**
+        internal for dependency injection purposes
+     */
+    init(rustBackend: ZcashRustBackendWelding.Type,
+         lowerBoundHeight: BlockHeight,
+         cacheDbURL: URL,
+         dataDbURL: URL,
+         pendingDbURL: URL,
+         endpoint: LightWalletEndpoint,
+         service: LightWalletService,
+         repository: TransactionRepository,
+         downloader: CompactBlockDownloader,
+         spendParamsURL: URL,
+         outputParamsURL: URL,
+         alias: String = "",
+         loggerProxy: Logger? = nil
+         
+    ) {
+        logger = loggerProxy
+        self.rustBackend = rustBackend
+        self.lowerBoundHeight = lowerBoundHeight
+        self.cacheDbURL = cacheDbURL
+        self.dataDbURL = dataDbURL
+        self.pendingDbURL = pendingDbURL
+        self.endpoint = endpoint
+        self.spendParamsURL = spendParamsURL
+        self.outputParamsURL = outputParamsURL
+        self.alias = alias
+        self.lightWalletService = service
+        self.transactionRepository = repository
+        self.downloader = downloader
     }
     
     /**
@@ -106,12 +152,18 @@ public class Initializer {
      do not already exist). These files can be given a prefix for scenarios where multiple wallets
      operate in one app--for instance, when sweeping funds from another wallet seed.
      - Parameters:
-       - seedProvider:  the seed to use for initializing this wallet.
-       - walletBirthdayHeight: the height corresponding to when the wallet seed was created. If null, this signals that the wallet is being born.
-       - numberOfAccounts: the number of accounts to create from this seed.
+       - viewingKeys: Extended Full Viewing Keys to initialize the DBs with
      */
     
-    public func initialize(seedProvider: SeedProvider, walletBirthdayHeight: BlockHeight, numberOfAccounts: Int = 1) throws -> [String]? {
+    public func initialize(viewingKeys: [String], walletBirthday: BlockHeight) throws {
+        let derivationTool = DerivationTool()
+        for vk in viewingKeys {
+            do {
+                try derivationTool.validateViewingKey(viewingKey: vk)
+            } catch {
+                throw InitializerError.invalidViewingKey(key: vk)
+            }
+        }
         
         do {
             try rustBackend.initDataDb(dbData: dataDbURL)
@@ -121,10 +173,7 @@ public class Initializer {
             throw InitializerError.dataDbInitFailed
         }
         
-        self.walletBirthday = WalletBirthday.birthday(with: walletBirthdayHeight)
-        guard let birthday = self.walletBirthday else {
-            throw InitializerError.falseStart
-        }
+        let birthday = WalletBirthday.birthday(with: walletBirthday)
         
         do {
             try rustBackend.initBlocksTable(dbData: dataDbURL, height: Int32(birthday.height), hash: birthday.hash, time: birthday.time, saplingTree: birthday.tree)
@@ -134,17 +183,23 @@ public class Initializer {
             throw InitializerError.dataDbInitFailed
         }
         
-        let lastDownloaded = (try? downloader.storage.latestHeight()) ?? self.walletBirthday?.height ?? ZcashSDK.SAPLING_ACTIVATION_HEIGHT
+        let lastDownloaded = (try? downloader.storage.latestHeight()) ?? birthday.height
         // resume from last downloaded block
         lowerBoundHeight = max(birthday.height, lastDownloaded)
         
-        self.processor = CompactBlockProcessorBuilder.buildProcessor(configuration: CompactBlockProcessor.Configuration(cacheDb: cacheDbURL, dataDb: dataDbURL, walletBirthday: walletBirthday?.height ?? self.lowerBoundHeight), downloader: self.downloader, transactionRepository: transactionRepository, backend: rustBackend)
+        let config = CompactBlockProcessor.Configuration(cacheDb: cacheDbURL,
+                                                         dataDb: dataDbURL,
+                                                         walletBirthday: birthday.height)
         
-        guard let accounts = rustBackend.initAccountsTable(dbData: dataDbURL, seed: seedProvider.seed(), accounts: Int32(numberOfAccounts)) else {
+        self.processor = CompactBlockProcessorBuilder.buildProcessor(configuration: config,
+                                                                     downloader: self.downloader,
+                                                                     transactionRepository: transactionRepository,
+                                                                     backend: rustBackend)
+        
+        guard try rustBackend.initAccountsTable(dbData: dataDbURL, exfvks: viewingKeys) else {
             throw rustBackend.lastError() ?? InitializerError.accountInitFailed
         }
         
-        return accounts
     }
     
     /**
@@ -192,11 +247,69 @@ public class Initializer {
     public func blockProcessor() -> CompactBlockProcessor? {
         self.processor
     }
+    
+    func isSpendParameterPresent() -> Bool {
+        FileManager.default.isReadableFile(atPath: self.spendParamsURL.path)
+    }
+    
+    func isOutputParameterPresent() -> Bool {
+        FileManager.default.isReadableFile(atPath: self.outputParamsURL.path)
+    }
+    
+    func downloadParametersIfNeeded(result: @escaping (Result<Bool,Error>) -> Void)  {
+        let spendParameterPresent = isSpendParameterPresent()
+        let outputParameterPresent = isOutputParameterPresent()
+        
+        if spendParameterPresent && outputParameterPresent {
+            result(.success(true))
+            return
+        }
+        
+        let outputURL = self.outputParamsURL
+        let spendURL = self.spendParamsURL
+        
+        if !outputParameterPresent {
+            SaplingParameterDownloader.downloadOutputParameter(outputURL) { outputResult in
+                switch outputResult {
+                case .failure(let e):
+                    result(.failure(e))
+                case .success:
+                    guard !spendParameterPresent else {
+                        result(.success(false))
+                        return
+                    }
+                    SaplingParameterDownloader.downloadSpendParameter(spendURL) { (spendResult) in
+                        switch spendResult {
+                        case .failure(let e):
+                            result(.failure(e))
+                        case .success:
+                            result(.success(false))
+                        }
+                    }
+                }
+            }
+        } else if !spendParameterPresent {
+            SaplingParameterDownloader.downloadSpendParameter(spendURL) { (spendResult) in
+                switch spendResult {
+                case .failure(let e):
+                    result(.failure(e))
+                case .success:
+                    result(.success(false))
+                }
+            }
+        }
+    }
 }
 
 class CompactBlockProcessorBuilder {
-    static func buildProcessor(configuration: CompactBlockProcessor.Configuration, downloader: CompactBlockDownloader, transactionRepository: TransactionRepository, backend: ZcashRustBackendWelding.Type) -> CompactBlockProcessor {
-        return CompactBlockProcessor(downloader: downloader, backend: backend, config: configuration, repository: transactionRepository)
+    static func buildProcessor(configuration: CompactBlockProcessor.Configuration,
+                               downloader: CompactBlockDownloader,
+                               transactionRepository: TransactionRepository,
+                               backend: ZcashRustBackendWelding.Type) -> CompactBlockProcessor {
+        return CompactBlockProcessor(downloader: downloader,
+                                     backend: backend,
+                                     config: configuration,
+                                     repository: transactionRepository)
     }
 }
 
