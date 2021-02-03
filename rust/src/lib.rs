@@ -70,7 +70,7 @@ use zcash_primitives::constants::mainnet::B58_PUBKEY_ADDRESS_PREFIX;
 // use crate::extended_key::{key_index::KeyIndex, ExtendedPrivKey, ExtendedPubKey, KeySeed};
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-fn string_to_network(coin_network_string: String) -> Option<CoinNetwork> {
+fn string_to_network(coin_network_string: String) -> Option<ChainNetwork> {
     match &coin_network_string[..] {
         "VRSC" => Some(ChainNetwork::VRSC),
         "ZEC" => Some(ChainNetwork::ZEC),
