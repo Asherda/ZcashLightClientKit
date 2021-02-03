@@ -9,6 +9,16 @@
 import Foundation
 
 class ZcashRustBackend: ZcashRustBackendWelding {
+    static func getChainNetworkId(chainNetwork: String) -> UInt16 {
+        switch chainNetwork {
+        case "VRSC":
+            return 1
+        case "ZEC":
+            return 2
+        default:
+            return 0
+        }
+    }
     
     static func lastError() -> RustWeldingError? {
         guard let message = getLastError() else { return nil }
@@ -174,23 +184,24 @@ class ZcashRustBackend: ZcashRustBackendWelding {
     static func validateCombinedChain(dbCache: URL, dbData: URL, chainNetwork: String) -> Int32 {
         let dbCache = dbCache.osStr()
         let dbData = dbData.osStr()
-        return zcashlc_validate_combined_chain(dbCache.0, dbCache.1, dbData.0, dbData.1, chainNetwork)
+        
+        return zcashlc_validate_combined_chain(dbCache.0, dbCache.1, dbData.0, dbData.1, getChainNetworkId(chainNetwork: chainNetwork))
     }
     
     static func rewindToHeight(dbData: URL, height: Int32, chainNetwork: String) -> Bool {
         let dbData = dbData.osStr()
-        return zcashlc_rewind_to_height(dbData.0, dbData.1, height, chainNetwork) != 0
+        return zcashlc_rewind_to_height(dbData.0, dbData.1, height, getChainNetworkId(chainNetwork: chainNetwork)) != 0
     }
     
     static func scanBlocks(dbCache: URL, dbData: URL, chainNetwork: String) -> Bool {
         let dbCache = dbCache.osStr()
         let dbData = dbData.osStr()
-        return zcashlc_scan_blocks(dbCache.0, dbCache.1, dbData.0, dbData.1, chainNetwork) != 0
+        return zcashlc_scan_blocks(dbCache.0, dbCache.1, dbData.0, dbData.1, getChainNetworkId(chainNetwork: chainNetwork)) != 0
     }
 
     static func decryptAndStoreTransaction(dbData: URL, tx: [UInt8], chainNetwork: String) -> Bool {
         let dbData = dbData.osStr()
-        return zcashlc_decrypt_and_store_transaction(dbData.0, dbData.1, tx, UInt(tx.count), chainNetwork) != 0
+        return zcashlc_decrypt_and_store_transaction(dbData.0, dbData.1, tx, UInt(tx.count), getChainNetworkId(chainNetwork: chainNetwork)) != 0
     }
 
     static func createToAddress(dbData: URL, account: Int32, extsk: String, consensusBranchId: Int32,to: String, value: Int64, memo: String?, spendParamsPath: String, outputParamsPath: String, chainNetwork: String) -> Int64 {
@@ -209,7 +220,7 @@ class ZcashRustBackend: ZcashRustBackendWelding {
                                          UInt(spendParamsPath.lengthOfBytes(using: .utf8)),
                                          outputParamsPath,
                                          UInt(outputParamsPath.lengthOfBytes(using: .utf8)),
-                                         chainNetwork)
+                                         getChainNetworkId(chainNetwork: chainNetwork))
     }
     
     static func deriveExtendedFullViewingKey(_ spendingKey: String) throws -> String? {
@@ -312,7 +323,7 @@ class ZcashRustBackend: ZcashRustBackendWelding {
     }
     
     static func consensusBranchIdFor(height: Int32, chainNetwork: String) throws -> Int32 {
-        let branchId = zcashlc_branch_id_for_height(height, chainNetwork)
+        let branchId = zcashlc_branch_id_for_height(height, getChainNetworkId(chainNetwork: chainNetwork))
         
         guard branchId != -1 else {
             throw RustWeldingError.noConsensusBranchId(height: height)

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int32_t zcashlc_branch_id_for_height(int32_t height, const char *chain_network_string);
+int32_t zcashlc_branch_id_for_height(int32_t height, uint16_t chain_network_id);
 
 /**
  * Clears the record of the last error message.
@@ -32,13 +32,13 @@ int64_t zcashlc_create_to_address(const uint8_t *db_data,
                                   uintptr_t spend_params_len,
                                   const uint8_t *output_params,
                                   uintptr_t output_params_len,
-                                  const char *chain_network_string);
+                                  uint16_t chain_network_id);
 
 int32_t zcashlc_decrypt_and_store_transaction(const uint8_t *db_data,
                                               uintptr_t db_data_len,
                                               const uint8_t *tx,
                                               uintptr_t tx_len,
-                                              const char *chain_network_string);
+                                              uint16_t chain_network_id);
 
 /**
  * derives a shielded address from the given extended full viewing key.
@@ -203,7 +203,10 @@ int32_t zcashlc_last_error_length(void);
  * If the requested height is greater than or equal to the height of the last scanned
  * block, this function does nothing.
  */
-int32_t zcashlc_rewind_to_height(const uint8_t *db_data, uintptr_t db_data_len, int32_t height, const char *chain_network_string);
+int32_t zcashlc_rewind_to_height(const uint8_t *db_data,
+                                 uintptr_t db_data_len,
+                                 int32_t height,
+                                 uint16_t chain_network_id);
 
 /**
  * Scans new blocks added to the cache for any transactions received by the tracked
@@ -225,7 +228,7 @@ int32_t zcashlc_scan_blocks(const uint8_t *db_cache,
                             uintptr_t db_cache_len,
                             const uint8_t *db_data,
                             uintptr_t db_data_len,
-                            const char *chain_network_string);
+                            uint16_t chain_network_id);
 
 /**
  * Frees strings returned by other zcashlc functions.
@@ -254,7 +257,7 @@ int32_t zcashlc_validate_combined_chain(const uint8_t *db_cache,
                                         uintptr_t db_cache_len,
                                         const uint8_t *db_data,
                                         uintptr_t db_data_len,
-                                        const char *chain_network_string);
+                                        uint16_t chain_network_id);
 
 /**
  * Frees vectors of strings returned by other zcashlc functions.
