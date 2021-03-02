@@ -65,7 +65,12 @@ struct SimpleConnectionProvider: ConnectionProvider {
     }
     
     func connection() throws -> Connection {
-        try Connection(path, readonly: readonly)
+        let db = try Connection(path, readonly: readonly)
+        
+        // Block until database isn't locked
+        db.busyHandler({ (_) in true })
+        
+        return db
     }
     
 }
