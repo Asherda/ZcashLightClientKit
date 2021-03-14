@@ -44,7 +44,7 @@ int32_t zcashlc_decrypt_and_store_transaction(const uint8_t *db_data,
  * derives a shielded address from the given extended full viewing key.
  * call zcashlc_string_free with the returned pointer when done using it
  */
-char *zcashlc_derive_extended_full_viewing_key(const char *extsk);
+char *zcashlc_derive_extended_full_viewing_key(const char *extsk, uint16_t chain_network_id);
 
 /**
  * Derives Extended Full Viewing Keys from the given seed into 'accounts' number of accounts.
@@ -56,7 +56,8 @@ char *zcashlc_derive_extended_full_viewing_key(const char *extsk);
 char **zcashlc_derive_extended_full_viewing_keys(const uint8_t *seed,
                                                  uintptr_t seed_len,
                                                  int32_t accounts,
-                                                 uintptr_t *capacity_ret);
+                                                 uintptr_t *capacity_ret,
+                                                 uint16_t chain_network_id);
 
 /**
  * Derives Extended Spending Keys from the given seed into 'accounts' number of accounts.
@@ -68,7 +69,8 @@ char **zcashlc_derive_extended_full_viewing_keys(const uint8_t *seed,
 char **zcashlc_derive_extended_spending_keys(const uint8_t *seed,
                                              uintptr_t seed_len,
                                              int32_t accounts,
-                                             uintptr_t *capacity_ret);
+                                             uintptr_t *capacity_ret,
+                                             uint16_t chain_network_id);
 
 /**
  * derives a shielded address from the given seed.
@@ -76,19 +78,20 @@ char **zcashlc_derive_extended_spending_keys(const uint8_t *seed,
  */
 char *zcashlc_derive_shielded_address_from_seed(const uint8_t *seed,
                                                 uintptr_t seed_len,
-                                                int32_t account_index);
+                                                int32_t account_index,
+                                                uint16_t chain_network_id);
 
 /**
  * derives a shielded address from the given viewing key.
  * call zcashlc_string_free with the returned pointer when done using it
  */
-char *zcashlc_derive_shielded_address_from_viewing_key(const char *extfvk);
+char *zcashlc_derive_shielded_address_from_viewing_key(const char *extfvk, uint16_t chain_network_id);
 
 /**
  * TEST TEST 123 TEST
  * Derives a transparent address from the given seed
  */
-char *zcashlc_derive_transparent_address_from_seed(const uint8_t *seed, uintptr_t seed_len);
+char *zcashlc_derive_transparent_address_from_seed(const uint8_t *seed, uintptr_t seed_len, uint16_t chain_network_id);
 
 /**
  * Copies the last error message into the provided allocated buffer.

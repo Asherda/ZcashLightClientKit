@@ -74,8 +74,13 @@ public enum KeyDerivationErrors: Error {
 public class DerivationTool: KeyDeriving {
     
     var rustwelding: ZcashRustBackendWelding.Type = ZcashRustBackend.self
+    var chainNetwork: String
+
+    init(chainNetwork: String) {
+        self.chainNetwork = chainNetwork
+    }
     
-    public static let `default` = DerivationTool()
+    public static let `default` = DerivationTool(chainNetwork: "VRSC")
     /**
      Given a seed and a number of accounts, return the associated viewing keys.
      
@@ -91,7 +96,7 @@ public class DerivationTool: KeyDeriving {
         }
         
         do {
-            guard let keys = try rustwelding.deriveExtendedFullViewingKeys(seed: seed, accounts: numberOfAccounts) else {
+            guard let keys = try rustwelding.deriveExtendedFullViewingKeys(seed: seed, accounts: numberOfAccounts, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return keys
@@ -109,7 +114,7 @@ public class DerivationTool: KeyDeriving {
     */
     public func deriveViewingKey(spendingKey: String) throws -> String {
         do {
-            guard let key = try rustwelding.deriveExtendedFullViewingKey(spendingKey) else {
+            guard let key = try rustwelding.deriveExtendedFullViewingKey(spendingKey, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return key
@@ -133,7 +138,7 @@ public class DerivationTool: KeyDeriving {
             throw KeyDerivationErrors.invalidInput
         }
         do {
-            guard let keys = try rustwelding.deriveExtendedSpendingKeys(seed: seed, accounts: numberOfAccounts) else {
+            guard let keys = try rustwelding.deriveExtendedSpendingKeys(seed: seed, accounts: numberOfAccounts, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return keys
@@ -157,7 +162,7 @@ public class DerivationTool: KeyDeriving {
         }
         
         do {
-            guard let address = try rustwelding.deriveShieldedAddressFromSeed(seed: seed, accountIndex: accountIndex) else {
+            guard let address = try rustwelding.deriveShieldedAddressFromSeed(seed: seed, accountIndex: accountIndex, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return address
@@ -177,7 +182,7 @@ public class DerivationTool: KeyDeriving {
      */
     public func deriveShieldedAddress(viewingKey: String) throws -> String {
         do {
-            guard let zaddr = try rustwelding.deriveShieldedAddressFromViewingKey(viewingKey) else {
+            guard let zaddr = try rustwelding.deriveShieldedAddressFromViewingKey(viewingKey, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return zaddr
@@ -191,7 +196,7 @@ public class DerivationTool: KeyDeriving {
             //  - the underlying implementation needs to be split out into a few lower-level calls
     public func deriveTransparentAddress(seed: [UInt8]) throws -> String {
         do {
-            guard let zaddr = try rustwelding.deriveTransparentAddressFromSeed(seed: seed) else {
+            guard let zaddr = try rustwelding.deriveTransparentAddressFromSeed(seed: seed, chainNetwork: chainNetwork) else {
                 throw KeyDerivationErrors.unableToDerive
             }
             return zaddr

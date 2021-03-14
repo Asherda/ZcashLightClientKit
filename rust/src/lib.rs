@@ -45,17 +45,6 @@ use zcash_primitives::consensus::TestNetwork as Network;
 
 use zcash_proofs::prover::LocalTxProver;
 
-#[cfg(feature = "mainnet")]
-use zcash_primitives::constants::mainnet::{
-    COIN_TYPE, HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY, HRP_SAPLING_EXTENDED_SPENDING_KEY,
-    HRP_SAPLING_PAYMENT_ADDRESS,
-};
-#[cfg(not(feature = "mainnet"))]
-use zcash_primitives::constants::testnet::{
-    COIN_TYPE, HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY, HRP_SAPLING_EXTENDED_SPENDING_KEY,
-    HRP_SAPLING_PAYMENT_ADDRESS,
-};
-
 use std::convert::TryFrom;
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +54,6 @@ use sha2::{Digest, Sha256};
 // use zcash_primitives::legacy::TransparentAddress;
 use hdwallet::{ExtendedPrivKey, KeyIndex};
 use secp256k1::{PublicKey, Secp256k1};
-use zcash_primitives::constants::mainnet::B58_PUBKEY_ADDRESS_PREFIX;
 
 // use crate::extended_key::{key_index::KeyIndex, ExtendedPrivKey, ExtendedPubKey, KeySeed};
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +133,10 @@ pub extern "C" fn zcashlc_init_accounts_table(
     chain_network_id: u16
 ) -> *mut *mut c_char {
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let coin_type = Network.coin_type(chain_network);
+        let hrp_sapling_extended_spending_key = Network.hrp_sapling_extended_spending_key(chain_network);
+
         let db_data = Path::new(OsStr::from_bytes(unsafe {
             slice::from_raw_parts(db_data, db_data_len)
         }));
@@ -156,7 +148,7 @@ pub extern "C" fn zcashlc_init_accounts_table(
         };
 
         let extsks: Vec<_> = (0..accounts)
-            .map(|account| spending_key(&seed, COIN_TYPE, account))
+            .map(|account| spending_key(&seed, coin_type, account))
             .collect();
         let extfvks: Vec<_> = extsks.iter().map(ExtendedFullViewingKey::from).collect();
 
@@ -175,7 +167,7 @@ pub extern "C" fn zcashlc_init_accounts_table(
             .iter()
             .map(|extsk| {
                 let encoded =
-                    encode_extended_spending_key(HRP_SAPLING_EXTENDED_SPENDING_KEY, extsk);
+                    encode_extended_spending_key(hrp_sapling_extended_spending_key, extsk);
                 CString::new(encoded).unwrap().into_raw()
             })
             .collect();
@@ -203,16 +195,19 @@ pub extern "C" fn zcashlc_init_accounts_table_with_keys(
             slice::from_raw_parts(db_data, db_data_len)
         }));
 
+    let chain_network = string_to_network(chain_network_id).unwrap();
+    let hrp_sapling_extended_full_viewing_key = Network.hrp_sapling_extended_full_viewing_key(chain_network);
+
     let extfvks = unsafe { std::slice::from_raw_parts(extfvks, extfvks_len)
         .into_iter()
         .map(|s| CStr::from_ptr(*s).to_str().unwrap())
         .map( |vkstr|
-            decode_extended_full_viewing_key(HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY, &vkstr)
+            decode_extended_full_viewing_key(hrp_sapling_extended_full_viewing_key, &vkstr)
                 .unwrap()
                 .unwrap()
         ).collect::<Vec<_>>() };
         
-        match init_accounts_table(&db_data, &Network, &extfvks, string_to_network(chain_network_id).unwrap()) {
+        match init_accounts_table(&db_data, &Network, &extfvks, chain_network) {
             Ok(()) => Ok(true),
             Err(e) => match e.kind() {
                 ErrorKind::TableNotEmpty => {
@@ -238,8 +233,13 @@ pub unsafe extern "C" fn zcashlc_derive_extended_spending_keys(
     seed_len: usize,
     accounts: i32,
     capacity_ret: *mut usize,
+    chain_network_id: u16
 ) -> *mut *mut c_char {
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let coin_type = Network.coin_type(chain_network);
+        let hrp_sapling_extended_spending_key = Network.hrp_sapling_extended_spending_key(chain_network);
+        
         let seed = slice::from_raw_parts(seed, seed_len);
         let accounts = if accounts > 0 {
             accounts as u32
@@ -248,7 +248,7 @@ pub unsafe extern "C" fn zcashlc_derive_extended_spending_keys(
         };
 
         let extsks: Vec<_> = (0..accounts)
-            .map(|account| spending_key(&seed, COIN_TYPE, account))
+            .map(|account| spending_key(&seed, coin_type, account))
             .collect();
 
         // Return the ExtendedSpendingKeys for the created accounts.
@@ -256,7 +256,7 @@ pub unsafe extern "C" fn zcashlc_derive_extended_spending_keys(
             .iter()
             .map(|extsk| {
                 let encoded =
-                    encode_extended_spending_key(HRP_SAPLING_EXTENDED_SPENDING_KEY, extsk);
+                    encode_extended_spending_key(hrp_sapling_extended_spending_key, extsk);
                 CString::new(encoded).unwrap().into_raw()
             })
             .collect();
@@ -279,8 +279,13 @@ pub unsafe extern "C" fn zcashlc_derive_extended_full_viewing_keys(
     seed_len: usize,
     accounts: i32,
     capacity_ret: *mut usize,
+    chain_network_id: u16
 ) -> *mut *mut c_char {
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let coin_type = Network.coin_type(chain_network);
+        let hrp_sapling_extended_full_viewing_key = Network.hrp_sapling_extended_full_viewing_key(chain_network);
+
         let seed = slice::from_raw_parts(seed, seed_len);
         let accounts = if accounts > 0 {
             accounts as u32
@@ -289,7 +294,7 @@ pub unsafe extern "C" fn zcashlc_derive_extended_full_viewing_keys(
         };
 
         let extsks: Vec<_> = (0..accounts)
-            .map(|account| ExtendedFullViewingKey::from(&spending_key(&seed, COIN_TYPE, account)))
+            .map(|account| ExtendedFullViewingKey::from(&spending_key(&seed, coin_type, account)))
             .collect();
 
         // Return the ExtendedSpendingKeys for the created accounts.
@@ -297,7 +302,7 @@ pub unsafe extern "C" fn zcashlc_derive_extended_full_viewing_keys(
             .iter()
             .map(|extsk| {
                 let encoded =
-                    encode_extended_full_viewing_key(HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY, extsk);
+                    encode_extended_full_viewing_key(hrp_sapling_extended_full_viewing_key, extsk);
                 CString::new(encoded).unwrap().into_raw()
             })
             .collect();
@@ -316,19 +321,24 @@ pub unsafe extern "C" fn zcashlc_derive_shielded_address_from_seed(
     seed: *const u8,
     seed_len: usize,
     account_index: i32,
+    chain_network_id: u16
 ) -> *mut c_char {
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let coin_type = Network.coin_type(chain_network);
+        let hrp_sapling_payment_address = Network.hrp_sapling_payment_address(chain_network);
+
         let seed = slice::from_raw_parts(seed, seed_len);
         let account_index = if account_index >= 0 {
             account_index as u32
         } else {
             return Err(format_err!("accounts argument must be greater than zero"));
         };
-        let address = spending_key(&seed, COIN_TYPE, account_index)
+        let address = spending_key(&seed, coin_type, account_index)
             .default_address()
             .unwrap()
             .1;
-        let address_str = encode_payment_address(HRP_SAPLING_PAYMENT_ADDRESS, &address);
+        let address_str = encode_payment_address(hrp_sapling_payment_address, &address);
         Ok(CString::new(address_str).unwrap().into_raw())
     });
     unwrap_exc_or_null(res)
@@ -338,12 +348,17 @@ pub unsafe extern "C" fn zcashlc_derive_shielded_address_from_seed(
 #[no_mangle]
 pub unsafe extern "C" fn zcashlc_derive_shielded_address_from_viewing_key(
     extfvk: *const c_char,
+    chain_network_id: u16
 ) -> *mut c_char {
 
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let hrp_sapling_extended_full_viewing_key = Network.hrp_sapling_extended_full_viewing_key(chain_network);
+        let hrp_sapling_payment_address = Network.hrp_sapling_payment_address(chain_network);
+
         let extfvk_string = CStr::from_ptr(extfvk).to_str()?;
         let extfvk = match decode_extended_full_viewing_key(
-            HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY,
+            hrp_sapling_extended_full_viewing_key,
             &extfvk_string,
         ) {
             Ok(Some(extfvk)) => extfvk,
@@ -358,7 +373,7 @@ pub unsafe extern "C" fn zcashlc_derive_shielded_address_from_viewing_key(
             }
         };
         let address = extfvk.default_address().unwrap().1;
-        let address_str = encode_payment_address(HRP_SAPLING_PAYMENT_ADDRESS, &address);
+        let address_str = encode_payment_address(hrp_sapling_payment_address, &address);
         Ok(CString::new(address_str).unwrap().into_raw())
     });
     unwrap_exc_or_null(res)
@@ -369,10 +384,15 @@ pub unsafe extern "C" fn zcashlc_derive_shielded_address_from_viewing_key(
 #[no_mangle]
 pub unsafe extern "C" fn zcashlc_derive_extended_full_viewing_key(
     extsk: *const c_char,
+    chain_network_id: u16
 ) -> *mut c_char {
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let hrp_sapling_extended_full_viewing_key = Network.hrp_sapling_extended_full_viewing_key(chain_network);
+        let hrp_sapling_extended_spending_key = Network.hrp_sapling_extended_spending_key(chain_network);
+
         let extsk = CStr::from_ptr(extsk).to_str()?;
-        let extfvk = match decode_extended_spending_key(HRP_SAPLING_EXTENDED_SPENDING_KEY, &extsk) {
+        let extfvk = match decode_extended_spending_key(hrp_sapling_extended_spending_key, &extsk) {
             Ok(Some(extsk)) => ExtendedFullViewingKey::from(&extsk),
             Ok(None) => {
                 return Err(format_err!("Deriving viewing key from spending key returned no results. Encoding was valid but type was incorrect."));
@@ -386,7 +406,7 @@ pub unsafe extern "C" fn zcashlc_derive_extended_full_viewing_key(
         };
 
         let encoded =
-            encode_extended_full_viewing_key(HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY, &extfvk);
+            encode_extended_full_viewing_key(hrp_sapling_extended_full_viewing_key, &extfvk);
 
         Ok(CString::new(encoded).unwrap().into_raw())
     });
@@ -783,7 +803,10 @@ pub extern "C" fn zcashlc_create_to_address(
             slice::from_raw_parts(output_params, output_params_len)
         }));
 
-        let extsk = match decode_extended_spending_key(HRP_SAPLING_EXTENDED_SPENDING_KEY, &extsk) {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let hrp_sapling_extended_spending_key = Network.hrp_sapling_extended_spending_key(chain_network);
+
+        let extsk = match decode_extended_spending_key(hrp_sapling_extended_spending_key, &extsk) {
             Ok(Some(extsk)) => extsk,
             Ok(None) => {
                 return Err(format_err!("ExtendedSpendingKey is for the wrong network"));
@@ -792,8 +815,6 @@ pub extern "C" fn zcashlc_create_to_address(
                 return Err(format_err!("Invalid ExtendedSpendingKey: {}", e));
             }
         };
-
-        let chain_network = string_to_network(chain_network_id).unwrap();
 
         let to = match RecipientAddress::decode(&Network, &to, chain_network) {
             Some(to) => to,
@@ -864,9 +885,14 @@ pub extern "C" fn zcashlc_vec_string_free(v: *mut *mut c_char, len: usize, capac
 pub unsafe extern "C" fn zcashlc_derive_transparent_address_from_seed(
     seed: *const u8,
     seed_len: usize,
+    chain_network_id: u16
 ) -> *mut c_char {
 
     let res = catch_panic(|| {
+        let chain_network = string_to_network(chain_network_id).unwrap();
+        let coin_type = Network.coin_type(chain_network);
+        let b58_pubkey_address_prefix = Network.b58_pubkey_address_prefix(chain_network);
+
         let seed = slice::from_raw_parts(seed, seed_len);
         
         // modified from: https://github.com/adityapk00/zecwallet-light-cli/blob/master/lib/src/lightwallet.rs
@@ -875,7 +901,7 @@ pub unsafe extern "C" fn zcashlc_derive_transparent_address_from_seed(
         let address_sk = ext_t_key
             .derive_private_key(KeyIndex::hardened_from_normalize_index(44).unwrap())
             .unwrap()
-            .derive_private_key(KeyIndex::hardened_from_normalize_index(COIN_TYPE).unwrap())
+            .derive_private_key(KeyIndex::hardened_from_normalize_index(coin_type).unwrap())
             .unwrap()
             .derive_private_key(KeyIndex::hardened_from_normalize_index(0).unwrap())
             .unwrap()
@@ -890,7 +916,7 @@ pub unsafe extern "C" fn zcashlc_derive_transparent_address_from_seed(
         hash160.update(Sha256::digest(&pk.serialize()[..].to_vec()));
         let address_string = hash160
             .finalize()
-            .to_base58check(&B58_PUBKEY_ADDRESS_PREFIX, &[]);
+            .to_base58check(b58_pubkey_address_prefix, &[]);
 
         Ok(CString::new(address_string).unwrap().into_raw())
     });

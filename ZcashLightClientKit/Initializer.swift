@@ -161,7 +161,7 @@ public class Initializer {
      */
     
     public func initialize(viewingKeys: [String], walletBirthday: BlockHeight) throws {
-        let derivationTool = DerivationTool()
+        let derivationTool = DerivationTool(chainNetwork: chainNetwork)
         for vk in viewingKeys {
             do {
                 try derivationTool.validateViewingKey(viewingKey: vk)

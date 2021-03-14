@@ -223,13 +223,13 @@ class ZcashRustBackend: ZcashRustBackendWelding {
                                          getChainNetworkId(chainNetwork: chainNetwork))
     }
     
-    static func deriveExtendedFullViewingKey(_ spendingKey: String) throws -> String? {
+    static func deriveExtendedFullViewingKey(_ spendingKey: String, chainNetwork: String) throws -> String? {
         
         guard !spendingKey.containsCStringNullBytesBeforeStringEnding() else {
             throw RustWeldingError.malformedStringInput
         }
         
-        guard let extsk = zcashlc_derive_extended_full_viewing_key([CChar](spendingKey.utf8CString)) else {
+        guard let extsk = zcashlc_derive_extended_full_viewing_key([CChar](spendingKey.utf8CString), getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -242,9 +242,9 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return derived
     }
     
-    static func deriveExtendedFullViewingKeys(seed: [UInt8], accounts: Int32) throws -> [String]? {
+    static func deriveExtendedFullViewingKeys(seed: [UInt8], accounts: Int32, chainNetwork: String) throws -> [String]? {
         var capacity = UInt(0);
-        guard let extsksCStr = zcashlc_derive_extended_full_viewing_keys(seed, UInt(seed.count), accounts, &capacity) else {
+        guard let extsksCStr = zcashlc_derive_extended_full_viewing_keys(seed, UInt(seed.count), accounts, &capacity, getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -259,9 +259,9 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return extsks
     }
     
-    static func deriveExtendedSpendingKeys(seed: [UInt8], accounts: Int32) throws -> [String]? {
+    static func deriveExtendedSpendingKeys(seed: [UInt8], accounts: Int32, chainNetwork: String) throws -> [String]? {
         var capacity = UInt(0);
-        guard let extsksCStr = zcashlc_derive_extended_spending_keys(seed, UInt(seed.count), accounts, &capacity) else {
+        guard let extsksCStr = zcashlc_derive_extended_spending_keys(seed, UInt(seed.count), accounts, &capacity, getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -276,8 +276,8 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return extsks
     }
     
-    static func deriveShieldedAddressFromSeed(seed: [UInt8], accountIndex: Int32) throws -> String? {
-        guard let zaddrCStr = zcashlc_derive_shielded_address_from_seed(seed, UInt(seed.count), accountIndex) else {
+    static func deriveShieldedAddressFromSeed(seed: [UInt8], accountIndex: Int32, chainNetwork: String) throws -> String? {
+        guard let zaddrCStr = zcashlc_derive_shielded_address_from_seed(seed, UInt(seed.count), accountIndex, getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -290,12 +290,12 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return zAddr
     }
     
-    static func deriveShieldedAddressFromViewingKey(_ extfvk: String) throws -> String? {
+    static func deriveShieldedAddressFromViewingKey(_ extfvk: String, chainNetwork: String) throws -> String? {
         guard !extfvk.containsCStringNullBytesBeforeStringEnding() else {
             throw RustWeldingError.malformedStringInput
         }
         
-        guard let zaddrCStr = zcashlc_derive_shielded_address_from_viewing_key([CChar](extfvk.utf8CString)) else {
+        guard let zaddrCStr = zcashlc_derive_shielded_address_from_viewing_key([CChar](extfvk.utf8CString), getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -308,9 +308,9 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return zAddr
     }
     
-    static func deriveTransparentAddressFromSeed(seed: [UInt8]) throws -> String? {
+    static func deriveTransparentAddressFromSeed(seed: [UInt8], chainNetwork: String) throws -> String? {
         
-        guard let tAddrCStr = zcashlc_derive_transparent_address_from_seed(seed, UInt(seed.count)) else {
+        guard let tAddrCStr = zcashlc_derive_transparent_address_from_seed(seed, UInt(seed.count), getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
