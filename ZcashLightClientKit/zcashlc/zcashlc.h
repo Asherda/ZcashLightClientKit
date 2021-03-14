@@ -150,7 +150,8 @@ char **zcashlc_init_accounts_table(const uint8_t *db_data,
                                    const uint8_t *seed,
                                    uintptr_t seed_len,
                                    int32_t accounts,
-                                   uintptr_t *capacity_ret);
+                                   uintptr_t *capacity_ret,
+                                   uint16_t chain_network_id);
 
 /**
  * Initialises the data database with the given extended full viewing keys
@@ -159,7 +160,8 @@ char **zcashlc_init_accounts_table(const uint8_t *db_data,
 bool zcashlc_init_accounts_table_with_keys(const uint8_t *db_data,
                                            uintptr_t db_data_len,
                                            const char *const *extfvks,
-                                           uintptr_t extfvks_len);
+                                           uintptr_t extfvks_len,
+                                           uint16_t chain_network_id);
 
 /**
  * Initialises the data database with the given block.
@@ -184,13 +186,13 @@ int32_t zcashlc_init_data_database(const uint8_t *db_data, uintptr_t db_data_len
  * Returns false in any other case
  * Errors when the provided address belongs to another network
  */
-bool zcashlc_is_valid_shielded_address(const char *address);
+bool zcashlc_is_valid_shielded_address(const char *address, uint16_t chain_network_id);
 
 /**
  * Returns true when the address is valid and transparent.
  * Returns false in any other case
  */
-bool zcashlc_is_valid_transparent_address(const char *address);
+bool zcashlc_is_valid_transparent_address(const char *address, uint16_t chain_network_id);
 
 /**
  * Returns the length of the last error message to be logged.

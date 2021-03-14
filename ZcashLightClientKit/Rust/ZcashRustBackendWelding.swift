@@ -40,13 +40,13 @@ public protocol ZcashRustBackendWelding {
     - Returns: true when the address is valid and shielded. Returns false in any other case
     - Throws: Error when the provided address belongs to another network
     */
-    static func isValidShieldedAddress(_ address: String) throws -> Bool
+    static func isValidShieldedAddress(_ address: String, chainNetwork: String) throws -> Bool
     
     /**
      - Returns: true when the address is valid and transparent. false in any other case
      - Throws: Error when the provided address belongs to another network
     */
-    static func isValidTransparentAddress(_ address: String) throws -> Bool
+    static func isValidTransparentAddress(_ address: String, chainNetwork: String) throws -> Bool
     
     /**
     initialize the accounts table from a given seed and a number of accounts
@@ -55,7 +55,7 @@ public protocol ZcashRustBackendWelding {
        - seed: byte array of the zip32 seed
        - accounts: how many accounts you want to have
  */
-    static func initAccountsTable(dbData: URL, seed: [UInt8], accounts: Int32) -> [String]?
+    static func initAccountsTable(dbData: URL, seed: [UInt8], accounts: Int32, chainNetwork: String) -> [String]?
     
     /**
     initialize the accounts table from a given seed and a number of accounts
@@ -64,7 +64,7 @@ public protocol ZcashRustBackendWelding {
        - exfvks: byte array of the zip32 seed
      - Returns: a boolean indicating if the database was initialized or an error
  */
-    static func initAccountsTable(dbData: URL, exfvks: [String]) throws -> Bool
+    static func initAccountsTable(dbData: URL, exfvks: [String], chainNetwork: String) throws -> Bool
     
     /**
     initialize the blocks table from a given checkpoint (birthday)

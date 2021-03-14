@@ -202,7 +202,7 @@ public class Initializer {
                                                                      transactionRepository: transactionRepository,
                                                                      backend: rustBackend)
         
-        guard try rustBackend.initAccountsTable(dbData: dataDbURL, exfvks: viewingKeys) else {
+        guard try rustBackend.initAccountsTable(dbData: dataDbURL, exfvks: viewingKeys, chainNetwork: chainNetwork) else {
             throw rustBackend.lastError() ?? InitializerError.accountInitFailed
         }
         
@@ -235,13 +235,13 @@ public class Initializer {
      checks if the provided address is a valid shielded zAddress
      */
     public func isValidShieldedAddress(_ address: String) -> Bool {
-        (try? rustBackend.isValidShieldedAddress(address)) ?? false
+        (try? rustBackend.isValidShieldedAddress(address, chainNetwork: chainNetwork)) ?? false
     }
     /**
      checks if the provided address is a transparent zAddress
      */
     public func isValidTransparentAddress(_ address: String) -> Bool {
-        (try? rustBackend.isValidTransparentAddress(address)) ?? false
+        (try? rustBackend.isValidTransparentAddress(address, chainNetwork: chainNetwork)) ?? false
     }
     
     /**

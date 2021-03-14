@@ -142,6 +142,7 @@ pub extern "C" fn zcashlc_init_accounts_table(
     seed_len: usize,
     accounts: i32,
     capacity_ret: *mut usize,
+    chain_network_id: u16
 ) -> *mut *mut c_char {
     let res = catch_panic(|| {
         let db_data = Path::new(OsStr::from_bytes(unsafe {
@@ -159,7 +160,7 @@ pub extern "C" fn zcashlc_init_accounts_table(
             .collect();
         let extfvks: Vec<_> = extsks.iter().map(ExtendedFullViewingKey::from).collect();
 
-        match init_accounts_table(&db_data, &Network, &extfvks) {
+        match init_accounts_table(&db_data, &Network, &extfvks, string_to_network(chain_network_id).unwrap()) {
             Ok(()) => (),
             Err(e) => match e.kind() {
                 ErrorKind::TableNotEmpty => {
@@ -195,6 +196,7 @@ pub extern "C" fn zcashlc_init_accounts_table_with_keys(
     db_data_len: usize,
     extfvks: *const *const c_char,
     extfvks_len: usize,
+    chain_network_id: u16
 ) -> bool {
     let res = catch_panic(|| {
         let db_data = Path::new(OsStr::from_bytes(unsafe {
@@ -210,7 +212,7 @@ pub extern "C" fn zcashlc_init_accounts_table_with_keys(
                 .unwrap()
         ).collect::<Vec<_>>() };
         
-        match init_accounts_table(&db_data, &Network, &extfvks) {
+        match init_accounts_table(&db_data, &Network, &extfvks, string_to_network(chain_network_id).unwrap()) {
             Ok(()) => Ok(true),
             Err(e) => match e.kind() {
                 ErrorKind::TableNotEmpty => {
@@ -458,11 +460,11 @@ pub extern "C" fn zcashlc_get_address(
 /// Returns false in any other case
 /// Errors when the provided address belongs to another network
 #[no_mangle]
-pub unsafe extern "C" fn zcashlc_is_valid_shielded_address(address: *const c_char) -> bool {
+pub unsafe extern "C" fn zcashlc_is_valid_shielded_address(address: *const c_char, chain_network_id: u16) -> bool {
     let res = catch_panic(|| {
         let addr = CStr::from_ptr(address).to_str()?;
 
-        match RecipientAddress::decode(&Network, &addr) {
+        match RecipientAddress::decode(&Network, &addr, string_to_network(chain_network_id).unwrap()) {
             Some(addr) => match addr {
                 RecipientAddress::Shielded(_) => Ok(true),
                 RecipientAddress::Transparent(_) => Ok(false),
@@ -476,11 +478,11 @@ pub unsafe extern "C" fn zcashlc_is_valid_shielded_address(address: *const c_cha
 /// Returns true when the address is valid and transparent.
 /// Returns false in any other case
 #[no_mangle]
-pub unsafe extern "C" fn zcashlc_is_valid_transparent_address(address: *const c_char) -> bool {
+pub unsafe extern "C" fn zcashlc_is_valid_transparent_address(address: *const c_char, chain_network_id: u16) -> bool {
     let res = catch_panic(|| {
         let addr = CStr::from_ptr(address).to_str()?;
 
-        match RecipientAddress::decode(&Network, &addr) {
+        match RecipientAddress::decode(&Network, &addr, string_to_network(chain_network_id).unwrap()) {
             Some(addr) => match addr {
                 RecipientAddress::Shielded(_) => Ok(false),
                 RecipientAddress::Transparent(_) => Ok(true),
@@ -791,7 +793,9 @@ pub extern "C" fn zcashlc_create_to_address(
             }
         };
 
-        let to = match RecipientAddress::decode(&Network, &to) {
+        let chain_network = string_to_network(chain_network_id).unwrap()
+
+        let to = match RecipientAddress::decode(&Network, &to, chain_network) {
             Some(to) => to,
             None => {
                 return Err(format_err!("PaymentAddress is for the wrong network"));
@@ -812,7 +816,7 @@ pub extern "C" fn zcashlc_create_to_address(
             value,
             Some(memo),
             OvkPolicy::Sender,
-            string_to_network(chain_network_id).unwrap()
+            chain_network
         )
         .map_err(|e| format_err!("Error while sending funds: {}", e))
     });

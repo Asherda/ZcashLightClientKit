@@ -56,12 +56,12 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         }
     }
     
-    static func isValidShieldedAddress(_ address: String) throws -> Bool {
+    static func isValidShieldedAddress(_ address: String, chainNetwork: String) throws -> Bool {
         guard !address.containsCStringNullBytesBeforeStringEnding() else {
             return false
         }
         
-        guard zcashlc_is_valid_shielded_address([CChar](address.utf8CString)) else {
+        guard zcashlc_is_valid_shielded_address([CChar](address.utf8CString), getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -70,12 +70,12 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return true
     }
     
-    static func isValidTransparentAddress(_ address: String) throws -> Bool {
+    static func isValidTransparentAddress(_ address: String, chainNetwork: String) throws -> Bool {
         guard !address.containsCStringNullBytesBeforeStringEnding() else {
                    return false
         }
         
-        guard zcashlc_is_valid_transparent_address([CChar](address.utf8CString)) else {
+        guard zcashlc_is_valid_transparent_address([CChar](address.utf8CString), getChainNetworkId(chainNetwork: chainNetwork)) else {
             if let error = lastError() {
                 throw error
             }
@@ -84,10 +84,10 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return true
     }
     
-    static func initAccountsTable(dbData: URL, seed: [UInt8], accounts: Int32) -> [String]? {
+    static func initAccountsTable(dbData: URL, seed: [UInt8], accounts: Int32, chainNetwork: String) -> [String]? {
         let dbData = dbData.osStr()
         var capacity = UInt(0);
-        let extsksCStr = zcashlc_init_accounts_table(dbData.0, dbData.1, seed, UInt(seed.count), accounts, &capacity)
+        let extsksCStr = zcashlc_init_accounts_table(dbData.0, dbData.1, seed, UInt(seed.count), accounts, &capacity, getChainNetworkId(chainNetwork: chainNetwork))
         if extsksCStr == nil {
             return nil
         }
@@ -100,7 +100,7 @@ class ZcashRustBackend: ZcashRustBackendWelding {
         return extsks
     }
     
-    static func initAccountsTable(dbData: URL, exfvks: [String]) throws -> Bool {
+    static func initAccountsTable(dbData: URL, exfvks: [String], chainNetwork: String) throws -> Bool {
         let dbData = dbData.osStr()
         let viewingKeys = exfvks.map { UnsafePointer(strdup($0)) }
         
@@ -108,7 +108,7 @@ class ZcashRustBackend: ZcashRustBackendWelding {
             throw RustWeldingError.malformedStringInput
         }
         
-        let res = zcashlc_init_accounts_table_with_keys(dbData.0, dbData.1, viewingKeys, UInt(viewingKeys.count));
+        let res = zcashlc_init_accounts_table_with_keys(dbData.0, dbData.1, viewingKeys, UInt(viewingKeys.count), getChainNetworkId(chainNetwork: chainNetwork));
         
         viewingKeys.compactMap({ UnsafeMutablePointer(mutating: $0) }).forEach({ free($0) })
         
