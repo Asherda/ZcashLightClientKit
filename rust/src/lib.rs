@@ -793,7 +793,7 @@ pub extern "C" fn zcashlc_create_to_address(
             }
         };
 
-        let chain_network = string_to_network(chain_network_id).unwrap()
+        let chain_network = string_to_network(chain_network_id).unwrap();
 
         let to = match RecipientAddress::decode(&Network, &to, chain_network) {
             Some(to) => to,
