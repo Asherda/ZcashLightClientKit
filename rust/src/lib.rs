@@ -38,6 +38,8 @@ use zcash_primitives::{
     zip32::ExtendedFullViewingKey,
 };
 
+use zcash_primitives::consensus::Parameters;
+
 #[cfg(feature = "mainnet")]
 use zcash_primitives::consensus::MainNetwork as Network;
 #[cfg(not(feature = "mainnet"))]
