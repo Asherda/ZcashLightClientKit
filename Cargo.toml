@@ -48,3 +48,4 @@ zcash_client_backend = { git = 'https://github.com/michaeltout/librustzcash.git'
 zcash_client_sqlite = { git = 'https://github.com/michaeltout/librustzcash', branch = 'mutable_chain_network' }
 zcash_primitives = { git = 'https://github.com/michaeltout/librustzcash', branch = 'mutable_chain_network' }
 zcash_proofs = { git = 'https://github.com/michaeltout/librustzcash', branch = 'mutable_chain_network' }
+lexical-core = {git = 'https://github.com/michaeltout/rust-lexical', branch = 'fix-warnings-and-update-deps'}
