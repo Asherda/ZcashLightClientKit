@@ -85,13 +85,16 @@ char *zcashlc_derive_shielded_address_from_seed(const uint8_t *seed,
  * derives a shielded address from the given viewing key.
  * call zcashlc_string_free with the returned pointer when done using it
  */
-char *zcashlc_derive_shielded_address_from_viewing_key(const char *extfvk, uint16_t chain_network_id);
+char *zcashlc_derive_shielded_address_from_viewing_key(const char *extfvk,
+                                                       uint16_t chain_network_id);
 
 /**
  * TEST TEST 123 TEST
  * Derives a transparent address from the given seed
  */
-char *zcashlc_derive_transparent_address_from_seed(const uint8_t *seed, uintptr_t seed_len, uint16_t chain_network_id);
+char *zcashlc_derive_transparent_address_from_seed(const uint8_t *seed,
+                                                   uintptr_t seed_len,
+                                                   uint16_t chain_network_id);
 
 /**
  * Copies the last error message into the provided allocated buffer.
