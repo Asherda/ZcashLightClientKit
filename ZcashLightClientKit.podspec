@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
     s.ios.deployment_target = '12.0'
     s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
     s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-    s.dependency 'gRPC-Swift', '= 1.0.0-alpha.19'
+    s.dependency 'gRPC-Swift', '= 1.7.2'
     s.dependency 'SQLite.swift', '~> 0.12.2' 
     s.ios.vendored_libraries = 'lib/libzcashlc.a'
     s.preserve_paths = ['Scripts', 'rust','docs','Cargo.*','ZcashLightClientKit/Stencil']
@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
          :script => 'sh ${PODS_TARGET_SRCROOT}/Scripts/generate_test_constants.sh && ${PODS_TARGET_SRCROOT}/Scripts/build_librustzcash_xcode.sh --testing',
          :execution_position => :before_compile
       }
-      test_spec.dependency 'gRPC-Swift', '= 1.0.0-alpha.19'
+      test_spec.dependency 'gRPC-Swift', '= 1.7.2'
       test_spec.dependency 'SQLite.swift', '~> 0.12.2'
   end
 end

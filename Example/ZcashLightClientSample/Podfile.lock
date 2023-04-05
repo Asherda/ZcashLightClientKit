@@ -1,23 +1,25 @@
 PODS:
-  - CGRPCZlib (1.0.0-alpha.19)
-  - CNIOAtomics (2.22.1)
-  - CNIOBoringSSL (2.9.1)
-  - CNIOBoringSSLShims (2.9.1):
-    - CNIOBoringSSL (= 2.9.1)
-  - CNIODarwin (2.22.1)
-  - CNIOHTTPParser (2.22.1)
-  - CNIOLinux (2.22.1)
-  - CNIOSHA1 (2.22.1)
-  - gRPC-Swift (1.0.0-alpha.19):
-    - CGRPCZlib (= 1.0.0-alpha.19)
-    - Logging (< 2, >= 1.2.0)
-    - SwiftNIO (< 3, >= 2.19.0)
-    - SwiftNIOHTTP2 (< 2, >= 1.12.2)
-    - SwiftNIOSSL (< 3, >= 2.8.0)
-    - SwiftNIOTransportServices (< 2, >= 1.6.0)
-    - SwiftProtobuf (< 2, >= 1.9.0)
-  - gRPC-Swift-Plugins (1.0.0-alpha.19):
-    - gRPC-Swift (= 1.0.0-alpha.19)
+  - _NIODataStructures (2.40.0)
+  - CGRPCZlib (1.7.2)
+  - CNIOAtomics (2.40.0)
+  - CNIOBoringSSL (2.19.0)
+  - CNIOBoringSSLShims (2.19.0):
+    - CNIOBoringSSL (= 2.19.0)
+  - CNIODarwin (2.40.0)
+  - CNIOHTTPParser (2.40.0)
+  - CNIOLinux (2.40.0)
+  - CNIOWindows (2.40.0)
+  - gRPC-Swift (1.7.2):
+    - CGRPCZlib (= 1.7.2)
+    - Logging (< 2.0.0, >= 1.4.0)
+    - SwiftNIO (< 3.0.0, >= 2.32.0)
+    - SwiftNIOExtras (< 2.0.0, >= 1.4.0)
+    - SwiftNIOHTTP2 (< 2.0.0, >= 1.19.2)
+    - SwiftNIOSSL (< 3.0.0, >= 2.14.0)
+    - SwiftNIOTransportServices (< 2.0.0, >= 1.11.1)
+    - SwiftProtobuf (< 2.0.0, >= 1.9.0)
+  - gRPC-Swift-Plugins (1.7.2):
+    - gRPC-Swift (= 1.7.2)
   - KRActivityIndicatorView (3.0.5)
   - KRProgressHUD (3.4.5):
     - KRActivityIndicatorView (= 3.0.5)
@@ -28,54 +30,147 @@ PODS:
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
-  - SwiftNIO (2.22.1):
-    - CNIOAtomics (= 2.22.1)
-    - CNIODarwin (= 2.22.1)
-    - CNIOLinux (= 2.22.1)
-    - CNIOSHA1 (= 2.22.1)
-    - SwiftNIOConcurrencyHelpers (= 2.22.1)
-  - SwiftNIOConcurrencyHelpers (2.22.1):
-    - CNIOAtomics (= 2.22.1)
-  - SwiftNIOFoundationCompat (2.22.1):
-    - SwiftNIO (= 2.22.1)
-  - SwiftNIOHPACK (1.14.2):
-    - SwiftNIO (< 3, >= 2.11.0)
-    - SwiftNIOConcurrencyHelpers (< 3, >= 2.11.0)
-    - SwiftNIOHTTP1 (< 3, >= 2.11.0)
-  - SwiftNIOHTTP1 (2.22.1):
-    - CNIOHTTPParser (= 2.22.1)
-    - SwiftNIO (= 2.22.1)
-    - SwiftNIOConcurrencyHelpers (= 2.22.1)
-  - SwiftNIOHTTP2 (1.14.2):
-    - SwiftNIO (< 3, >= 2.11.0)
-    - SwiftNIOConcurrencyHelpers (< 3, >= 2.11.0)
-    - SwiftNIOHPACK (= 1.14.2)
-    - SwiftNIOHTTP1 (< 3, >= 2.11.0)
-    - SwiftNIOTLS (< 3, >= 2.11.0)
-  - SwiftNIOSSL (2.9.1):
-    - CNIOBoringSSL (= 2.9.1)
-    - CNIOBoringSSLShims (= 2.9.1)
-    - SwiftNIO (< 3, >= 2.22.0)
-    - SwiftNIOConcurrencyHelpers (< 3, >= 2.22.0)
-    - SwiftNIOTLS (< 3, >= 2.22.0)
-  - SwiftNIOTLS (2.22.1):
-    - SwiftNIO (= 2.22.1)
-  - SwiftNIOTransportServices (1.9.0):
-    - SwiftNIO (< 3, >= 2.22.0)
-    - SwiftNIOConcurrencyHelpers (< 3, >= 2.22.0)
-    - SwiftNIOFoundationCompat (< 3, >= 2.22.0)
-    - SwiftNIOTLS (< 3, >= 2.22.0)
-  - SwiftProtobuf (1.12.0)
+  - SwiftNIO (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIODarwin (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - CNIOWindows (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+    - SwiftNIOEmbedded (= 2.40.0)
+    - SwiftNIOPosix (= 2.40.0)
+  - SwiftNIOConcurrencyHelpers (2.40.0):
+    - CNIOAtomics (= 2.40.0)
+  - SwiftNIOCore (2.40.0):
+    - CNIOAtomics (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+  - SwiftNIOEmbedded (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+  - SwiftNIOExtras (1.11.0):
+    - _NIODataStructures (< 3, >= 2.32.0)
+    - CNIOAtomics (< 3, >= 2.32.0)
+    - CNIODarwin (< 3, >= 2.32.0)
+    - CNIOLinux (< 3, >= 2.32.0)
+    - CNIOWindows (< 3, >= 2.32.0)
+    - SwiftNIO (< 3, >= 2.32.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.32.0)
+    - SwiftNIOCore (< 3, >= 2.32.0)
+    - SwiftNIOEmbedded (< 3, >= 2.32.0)
+    - SwiftNIOPosix (< 3, >= 2.32.0)
+  - SwiftNIOFoundationCompat (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIODarwin (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - CNIOWindows (= 2.40.0)
+    - SwiftNIO (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+    - SwiftNIOEmbedded (= 2.40.0)
+    - SwiftNIOPosix (= 2.40.0)
+  - SwiftNIOHPACK (1.22.0):
+    - _NIODataStructures (< 3, >= 2.35.0)
+    - CNIOAtomics (< 3, >= 2.35.0)
+    - CNIODarwin (< 3, >= 2.35.0)
+    - CNIOHTTPParser (< 3, >= 2.35.0)
+    - CNIOLinux (< 3, >= 2.35.0)
+    - CNIOWindows (< 3, >= 2.35.0)
+    - SwiftNIO (< 3, >= 2.35.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.35.0)
+    - SwiftNIOCore (< 3, >= 2.35.0)
+    - SwiftNIOEmbedded (< 3, >= 2.35.0)
+    - SwiftNIOHTTP1 (< 3, >= 2.35.0)
+    - SwiftNIOPosix (< 3, >= 2.35.0)
+  - SwiftNIOHTTP1 (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIODarwin (= 2.40.0)
+    - CNIOHTTPParser (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - CNIOWindows (= 2.40.0)
+    - SwiftNIO (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+    - SwiftNIOEmbedded (= 2.40.0)
+    - SwiftNIOPosix (= 2.40.0)
+  - SwiftNIOHTTP2 (1.22.0):
+    - _NIODataStructures (< 3, >= 2.35.0)
+    - CNIOAtomics (< 3, >= 2.35.0)
+    - CNIODarwin (< 3, >= 2.35.0)
+    - CNIOHTTPParser (< 3, >= 2.35.0)
+    - CNIOLinux (< 3, >= 2.35.0)
+    - CNIOWindows (< 3, >= 2.35.0)
+    - SwiftNIO (< 3, >= 2.35.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.35.0)
+    - SwiftNIOCore (< 3, >= 2.35.0)
+    - SwiftNIOEmbedded (< 3, >= 2.35.0)
+    - SwiftNIOHPACK (= 1.22.0)
+    - SwiftNIOHTTP1 (< 3, >= 2.35.0)
+    - SwiftNIOPosix (< 3, >= 2.35.0)
+    - SwiftNIOTLS (< 3, >= 2.35.0)
+  - SwiftNIOPosix (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIODarwin (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - CNIOWindows (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+  - SwiftNIOSSL (2.19.0):
+    - _NIODataStructures (< 3, >= 2.32.0)
+    - CNIOAtomics (< 3, >= 2.32.0)
+    - CNIOBoringSSL (= 2.19.0)
+    - CNIOBoringSSLShims (= 2.19.0)
+    - CNIODarwin (< 3, >= 2.32.0)
+    - CNIOLinux (< 3, >= 2.32.0)
+    - CNIOWindows (< 3, >= 2.32.0)
+    - SwiftNIO (< 3, >= 2.32.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.32.0)
+    - SwiftNIOCore (< 3, >= 2.32.0)
+    - SwiftNIOEmbedded (< 3, >= 2.32.0)
+    - SwiftNIOPosix (< 3, >= 2.32.0)
+    - SwiftNIOTLS (< 3, >= 2.32.0)
+  - SwiftNIOTLS (2.40.0):
+    - _NIODataStructures (= 2.40.0)
+    - CNIOAtomics (= 2.40.0)
+    - CNIODarwin (= 2.40.0)
+    - CNIOLinux (= 2.40.0)
+    - CNIOWindows (= 2.40.0)
+    - SwiftNIO (= 2.40.0)
+    - SwiftNIOConcurrencyHelpers (= 2.40.0)
+    - SwiftNIOCore (= 2.40.0)
+    - SwiftNIOEmbedded (= 2.40.0)
+    - SwiftNIOPosix (= 2.40.0)
+  - SwiftNIOTransportServices (1.12.0):
+    - _NIODataStructures (< 3, >= 2.32.0)
+    - CNIOAtomics (< 3, >= 2.32.0)
+    - CNIODarwin (< 3, >= 2.32.0)
+    - CNIOLinux (< 3, >= 2.32.0)
+    - CNIOWindows (< 3, >= 2.32.0)
+    - SwiftNIO (< 3, >= 2.32.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.32.0)
+    - SwiftNIOCore (< 3, >= 2.32.0)
+    - SwiftNIOEmbedded (< 3, >= 2.32.0)
+    - SwiftNIOFoundationCompat (< 3, >= 2.32.0)
+    - SwiftNIOPosix (< 3, >= 2.32.0)
+    - SwiftNIOTLS (< 3, >= 2.32.0)
+  - SwiftProtobuf (1.21.0)
   - ZcashLightClientKit (0.9.1):
-    - gRPC-Swift (= 1.0.0-alpha.19)
+    - gRPC-Swift (= 1.7.2)
     - SQLite.swift (~> 0.12.2)
   - ZcashLightClientKit/Tests (0.9.1):
-    - gRPC-Swift (= 1.0.0-alpha.19)
+    - gRPC-Swift (= 1.7.2)
     - SQLite.swift (~> 0.12.2)
 
 DEPENDENCIES:
-  - gRPC-Swift (= 1.0.0-alpha.19)
-  - gRPC-Swift-Plugins (= 1.0.0-alpha.19)
+  - gRPC-Swift (= 1.7.2)
+  - gRPC-Swift-Plugins (= 1.7.2)
   - KRProgressHUD
   - MnemonicSwift (from `https://github.com/zcash-hackworks/MnemonicSwift.git`)
   - NotificationBubbles
@@ -85,6 +180,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - _NIODataStructures
     - CGRPCZlib
     - CNIOAtomics
     - CNIOBoringSSL
@@ -92,7 +188,7 @@ SPEC REPOS:
     - CNIODarwin
     - CNIOHTTPParser
     - CNIOLinux
-    - CNIOSHA1
+    - CNIOWindows
     - gRPC-Swift
     - gRPC-Swift-Plugins
     - KRActivityIndicatorView
@@ -103,10 +199,14 @@ SPEC REPOS:
     - SQLite.swift
     - SwiftNIO
     - SwiftNIOConcurrencyHelpers
+    - SwiftNIOCore
+    - SwiftNIOEmbedded
+    - SwiftNIOExtras
     - SwiftNIOFoundationCompat
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftNIOHTTP2
+    - SwiftNIOPosix
     - SwiftNIOSSL
     - SwiftNIOTLS
     - SwiftNIOTransportServices
@@ -124,16 +224,17 @@ CHECKOUT OPTIONS:
     :git: https://github.com/zcash-hackworks/MnemonicSwift.git
 
 SPEC CHECKSUMS:
-  CGRPCZlib: befd9b92013c647f18aa9b7d9e9231d52e1ced1b
-  CNIOAtomics: 55026298b0bd7524bb8ca85bd9d00983ef2b6ab5
-  CNIOBoringSSL: ee7722e4355434b420eb06b3ca7535a6cfb09cf2
-  CNIOBoringSSLShims: e76fde7b7972f242e250f76dafcfdbd23be26eca
-  CNIODarwin: 65c40ddcfa113c0cb0bf5947dbef3165a0098b59
-  CNIOHTTPParser: 869e928f9f9b7bb68837e085b3ae921125d28d76
-  CNIOLinux: 896c5715ebe479fbfcdac5340717bbbd7936901b
-  CNIOSHA1: fd4d38fb42778ed971a75d87530f842106d4b4f4
-  gRPC-Swift: 75a7a8d7cd08177165ef971159afb84e5130cfc9
-  gRPC-Swift-Plugins: 5827cb75fe1f6e24423635fa1ec85fd67a529aef
+  _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
+  CGRPCZlib: 290fba348cc0c620ebb461f82c1c2d05bb7b9075
+  CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18
+  CNIOBoringSSL: 2c9c96c2e95f15e83fb8d26b9738d939cc39ae33
+  CNIOBoringSSLShims: c5c9346e7bbd1040f4f8793a35441dda7487539a
+  CNIODarwin: 93850990d29f2626b05306c6c9309f9be0d74c2f
+  CNIOHTTPParser: 8ce395236fa1d09ac3b4f4bcfba79b849b2ac684
+  CNIOLinux: 62e3505f50de558c393dc2f273dde71dcce518da
+  CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
+  gRPC-Swift: 8426019a9c56401ee1b9ef00f15fb5530eb8cdd2
+  gRPC-Swift-Plugins: 40b00060f66d39c361bdf84b5c3ee28af064ef7a
   KRActivityIndicatorView: 912bc0413d98340f384b12a4e1e6aa8f42fb377d
   KRProgressHUD: df4cdc3a1baf708d4276a089ee34d133fa9a6f3e
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
@@ -141,18 +242,22 @@ SPEC CHECKSUMS:
   NotificationBubbles: 91ee10deee54f35b5d49a161e1cb3d788ab5d011
   PaginatedTableView: 294d9831d5ddf5c0dcfbb4a281d4fcfb8d12f55a
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
-  SwiftNIO: 763188229de166e046cc8975383cca388832e992
-  SwiftNIOConcurrencyHelpers: 34d2e9d4d2b7886fa765086e845e6b19417be927
-  SwiftNIOFoundationCompat: 990bf137ed31a0907be67a0f80cfa9d3ad66289d
-  SwiftNIOHPACK: 38b7703a984bf25f7abcd468f66e4ac89e2a52dd
-  SwiftNIOHTTP1: c0a9ce48ba256f349af4f09648a0e0939b11a65c
-  SwiftNIOHTTP2: 2f6ea199f7df6e7041dcfb49fba175c69c8ca925
-  SwiftNIOSSL: 2967e874b40d05904edde5c540c3157621e5ecc4
-  SwiftNIOTLS: 80eed55b4d2a455ba4b387b12cb41962095c713a
-  SwiftNIOTransportServices: 801923921fbecdcde1e1c1ff38e812167d01ead1
-  SwiftProtobuf: 4ef85479c18ca85b5482b343df9c319c62bda699
-  ZcashLightClientKit: d5a681033b3f59c59c93837232ed7890d3e07918
+  SwiftNIO: 829958aab300642625091f82fc2f49cb7cf4ef24
+  SwiftNIOConcurrencyHelpers: 697370136789b1074e4535eaae75cbd7f900370e
+  SwiftNIOCore: 473fdfe746534d7aa25766916459eeaf6f92ef49
+  SwiftNIOEmbedded: ffcb5147db67d9686c8366b7f8427b36132f2c8a
+  SwiftNIOExtras: 481f74d6bf0b0ef699905ed66439cb019c4975c9
+  SwiftNIOFoundationCompat: b9cdbea4806e4a12e9f66d9696fa3b98c4c3232b
+  SwiftNIOHPACK: e7d3ff5bd671528adfb11cd4e0c84ddfdc3c4453
+  SwiftNIOHTTP1: ef56706550a1dc135ea69d65215b9941e643c23b
+  SwiftNIOHTTP2: cc81d7a6ba70d2ddc5376f471904b27ef5d2b7b8
+  SwiftNIOPosix: b49af4bdbecaadfadd5c93dfe28594d6722b75e4
+  SwiftNIOSSL: d153c5a6fc5b2301b0519b4c4d037a9414212da6
+  SwiftNIOTLS: 598af547490133e9aac52aed0c23c4a90c31dcfc
+  SwiftNIOTransportServices: 0b2b407819d82eb63af558c5396e33c945759503
+  SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
+  ZcashLightClientKit: 4e4273f2e841e982fedad461a9008cca19089f5c
 
-PODFILE CHECKSUM: d65d459355c343ccdc6213c470dcc654a7addacb
+PODFILE CHECKSUM: ab6ab61c46a8ace21ae16cccc2481506060ba6d1
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.11.3
